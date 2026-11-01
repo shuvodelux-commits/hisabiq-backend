@@ -1,6 +1,6 @@
 # Subscription-Aware Tenant Migration Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Execution authority:** Follow [the HisabIQ Super Board execution plan](../../super-board/hisabiq-execution-plan.md). This document supplies technical requirements only. Owner-approved GitHub issues, native lint, Super Build, independent QA/security and Super Review govern execution; work one task at a time and wait for human merge/phase approval.
 
 **Goal:** Safely migrate a HisabIQ business between Free, Paid and dedicated Premium D1 placements, including upgrades, downgrades, capacity exceptions, crashes and offline retries, without losing financial history or enabling simultaneous writers.
 
@@ -22,7 +22,7 @@
 - A migration's source remains authoritative before route switch; after switch forward recovery, not unchecked rollback.
 - Historical invoices, subledgers, attachments and all accepted operation IDs are never deleted to satisfy downgraded quotas.
 - Downgrade effective-date policy and customer notification/payment handling require owner sign-off before production.
-- Use Superpowers RED → GREEN → REFACTOR, Ponytail minimal safe abstractions, Cloudflare security-audit review, draft GitHub PR per reviewable task.
+- Use the Super Build label-selected TDD discipline and documented Ponytail fallback. Verify RED before GREEN, refactor during review, and intentionally invoke Cloudflare security-audit at required milestones. One issue and draft PR per approved slice; no competing orchestrator.
 - Tests use synthetic tenants only. Do not deploy, provision production, merge or migrate customer data without explicit approval.
 
 ## Review Focus
@@ -156,6 +156,8 @@
 
 ## Delivery boundaries
 
+The PR labels below are historical conceptual groups, not execution batches. The current Super Board roadmap assigns their content to P2/P7/P8/P10/P11; split into independently verifiable issues within the normal size limit. Complete, review and obtain owner merge approval for one task before selecting the next.
+
 - **PR A (P2):** Task 1 pure lifecycle decision; can be reviewed before live migration.
 - **PR B (P2/P7):** Task 2 registry/admission and idempotent jobs.
 - **PR C (P7):** Task 3 manifest/copy.
@@ -173,4 +175,4 @@ A synthetic Free→Premium→Basic→Free migration chain passes with stable bus
 
 ## Handoff
 
-**Recommended implementation mode:** subagent-driven with independent per-task review, because migration and accounting failures can create permanent financial loss. If native execution is selected, require the complete Superpowers TDD and final independent review. Obtain owner review for this design and plan before implementation.
+**Required implementation mode:** Super Board only, with `max_workers: 1`, selected-host readiness, native issue/dependency contracts, Super Build TDD, independent Super QA with PR security review, explicit milestone Cloudflare audit and independent Super Review. The owner approves every merge and phase gate. Keep future tasks in Backlog; this technical plan does not authorize implementation, migration or deployment.

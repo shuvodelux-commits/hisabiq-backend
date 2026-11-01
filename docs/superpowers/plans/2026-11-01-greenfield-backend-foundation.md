@@ -1,6 +1,6 @@
 # HisabIQ Greenfield Backend — Final Architecture and Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Execution authority:** Use [HisabIQ Super Board Agent Execution Plan](../../super-board/hisabiq-execution-plan.md) for issue creation, agent/skill routing, TDD, QA, security-audit gates, review and human merge approvals. This file remains the technical architecture and phase acceptance authority. Superpowers/Addy skills are optional supporting tools only when actually installed and verified; do not run a second competing orchestrator.
 
 **Date:** 2026-11-01  
 **Status:** Approved direction; development authorized for non-production code and proof-of-concept work. Production activation is explicitly gated.  
@@ -190,25 +190,23 @@ Do not implement all modules in parallel. First complete P1 accounting and P2 is
 - Migration tests inject power/network failures immediately before/after CAS route switch, concurrent final-stock sales, duplicate billing events, and overdue offline queue resync.
 - Target provisioning must use a verified binding manifest/Worker-cell plan, never arbitrary client DB identifiers.
 
-## Skill Execution Policy
+## Skill Execution Policy — Super Board 3.3.0
 
-| Stage | Primary skill | Supporting skill | Gate |
+**Primary execution policy:** [HisabIQ Super Board Agent Execution Plan](../../super-board/hisabiq-execution-plan.md). The architecture decisions, phase order, and safety invariants in this file are unchanged.
+
+| Stage | Accountable owner | Executing skill / workflow | Stop condition |
 |---|---|---|---|
-| Design/phase breakdown | obra/superpowers:writing-plans | addyosmani:spec-driven-development | Explicit specs, interfaces, acceptance tests |
-| Coding | obra/superpowers:test-driven-development | Ponytail full + addyosmani:incremental-implementation | Failing test before production code; full green suite |
-| API contract | addyosmani:api-and-interface-design | addyosmani:source-driven-development | OpenAPI contract + compatibility tests |
-| Complexity | Ponytail full/review | addyosmani:code-simplification | No speculative abstraction |
-| Security per PR | addyosmani:security-and-hardening | Cloudflare security-audit-skill guidance/focused review | No critical/high boundary failures |
-| Release audit | Cloudflare security-audit-skill full audit | independent review | Verified findings and coverage ledger |
-| Delivery | obra/superpowers:finishing-a-development-branch | addyosmani:ci-cd-and-automation | Draft PR, human approval for merge/deploy |
+| Plan | Human + planner | Approved ADR/spec, design preflight when warranted | Undefined business/security boundary |
+| Triage | Super Board operator | `onboard` (once), GitHub issue contracts, `lint` | Missing dependency, unclear AC, host not ready |
+| Build | Super Build agent | Label-based `implement`/`diagnosing-bugs`, `tdd`, simplest-first fallback, self-review | RED→GREEN unproven or failing tests |
+| QA | Super QA agent | Functional/negative testing + built-in `pr-security-review` | Exploitable PR change or unmet AC |
+| Deep security | Independent audit, explicit milestone | Cloudflare `security-audit` (outside automatic board lanes) | Audit missing or high/critical failure |
+| Review | Super Review agent | Independent design/code/complexity assessment, merge gate | Missing evidence or reviewer blocker |
+| Merge/phase release | Human owner | Approval of exact PR and phase evidence | Any unapproved merge, database or deployment action |
 
-For Codex CLI, install/version-pin the required external skills explicitly after reviewing their upstream source and licensing:
-- https://github.com/addyosmani/agent-skills
-- https://github.com/obra/superpowers
-- https://github.com/cloudflare/security-audit-skill
-- Ponytail is a separately installed engineering-suite skill in ChatGPT; verify the intended local Codex distribution before claiming Codex has it.
+Optional obra/superpowers and addyosmani/agent-skills may support planning and narrow API tasks **only if installed and resolved for the selected host**; they do not displace Super Board routing or duplicate TDD. Dedicated Ponytail is not currently resolved locally; use Super Board's documented fallback honestly. Never claim an unexecuted Cloudflare audit passed.
 
-Use one orchestrating workflow: Superpowers owns execution and TDD; Addy skills supplement API/testing/quality, Ponytail simplifies; security-audit-skill evaluates security. Do not run contradictory TDD coordinators in parallel.
+**Host readiness is mandatory** before `super-board run`: Github Project scopes, board config, clean base worktree, real verification commands, and `super-board-skills-ready.py` for the actual worker host. Human approval is mandatory for every merge; no live migrations or deploys.
 
 ## Repository and Delivery Rules
 
