@@ -1,0 +1,3 @@
+# Backend development rules
+
+Use `docs/superpowers/plans/2026-11-01-greenfield-backend-foundation.md` as the architecture and execution authority. Use Superpowers test-driven development: test RED before source GREEN; record real command outputs. Ponytail full mode: minimal safe solution, no speculative layers. Addy Osmani agent-skills complement API design, CI and reviews. Cloudflare security-audit-skill provides scoped security review on security-sensitive changes and full audit before production. Never edit `hisabiq_ui` components; connect their existing API contracts only after contract review. No production deploy, PR merge or customer migration without owner approval. Financial and tenant isolation tests are blockers.
