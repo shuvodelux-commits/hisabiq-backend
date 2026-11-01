@@ -37,7 +37,7 @@ Required board verification commands are the frozen install, typecheck and unit-
 
 ## Board operation
 
-Host: Codex. Base branch: `main`. Initial concurrency: `max_workers: 1` through P1/P2. Every merge requires explicit owner approval (`human_approves_merge: true`, `merge_policy.default: "human"`). Required GitHub CI and main branch protection are readiness gates, not assumed facts.
+Host: Codex. Base branch: `main`. Concurrency: `max_workers: 1` through P12. Never merge automatically. An explicit owner-chat instruction authorizes the agent to merge the identified PR after required checks, without a second GitHub `done` confirmation. Keep unattended merging disabled (`human_approves_merge: true`, `merge_policy.default: "human"`); follow the attended procedure in the execution plan. Required GitHub CI and main branch protection are readiness gates, not assumed facts.
 
 Super Board is the sole task orchestrator. Approve narrow scope first; curate dependency-aware issues with testable acceptance criteria; onboard and lint before running eligible work. Build uses a failing behavioral test before implementation. Independent QA includes bundled `pr-security-review`; independent Review checks the exact PR head and evidence. Cloudflare `security-audit` is a separate, deliberately invoked milestone gate. Installation or readiness never proves an audit ran.
 

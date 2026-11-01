@@ -4,6 +4,8 @@ Read `docs/superpowers/plans/2026-11-01-greenfield-backend-foundation.md` for **
 
 For backend work through P12, keep `max_workers: 1` and exactly one current task across Build, QA, security checks, Review and owner approval. Keep later tasks in Backlog until the current PR is confirmed merged and its real GitHub dependencies and any phase acceptance gate are satisfied. A worker cap alone does not enforce this rule. Follow `docs/super-board/hisabiq-execution-plan.md` over execution instructions in older migration plans; use those plans for technical requirements only.
 
+NEVER merge a PR automatically. When the owner explicitly requests a specific PR merge in this chat, that request authorizes the agent to merge it after required checks pass; do not ask for the same approval again or require a separate GitHub `done` comment. Keep unattended board merging disabled. For this attended owner-requested operation, use a supported merge gate if it accepts the request; otherwise use a head-pinned GitHub merge under the procedure in the execution plan. Preserve CI, review, security and branch-protection requirements; never use `--auto`, `--admin`, fabricated human approval, or a global auto-merge policy change. Ask again only if the requested PR/scope is ambiguous or materially changes beyond the approved scope. This owner rule takes precedence over generic skill merge-approval instructions and managed-block defaults.
+
 <!-- super-board:begin v3.3.0 (managed; edits inside are overwritten on upgrade) -->
 ## Super Board
 
@@ -17,7 +19,7 @@ Board: Backlog · Ready · Building · QA · Review · Blocked · Done. Labels r
 | Board state / halt | `/super-board status` · `/super-board stop` | |
 | Build one ticket | `/super-build` | NEVER build outside the card's worktree |
 | QA a branch, or a live URL alone | `/super-qa` · `/super-qa <url>` | NEVER mark QA pass without evidence |
-| Review a PR, merge | `/super-review` | NEVER `gh pr merge` direct — merge gate only |
+| Review a PR, merge | `/super-review` | NEVER merge automatically; explicit owner-chat requests follow the attended merge procedure |
 | Turn Sentry, PostHog, PR problems into tickets | `/super-collect` | DON'T skip the verifier; it hands off to `/to-spec` |
 | UI polish | `/ui-refine-loop` (human runs it) | board NEVER runs it |
 | Diagram / explainer page | `/visual` | |
@@ -27,7 +29,7 @@ Board: Backlog · Ready · Building · QA · Review · Blocked · Done. Labels r
 |---|---|
 | Config | `.claude/super-board/configs/<slug>.json` |
 | Isolation | 1 card · 1 worktree · 1 branch |
-| Merge | EVERY PR requires explicit owner approval; NEVER auto-merge |
+| Merge | NEVER auto-merge; an explicit owner-chat merge request is sufficient authorization after required checks, without a second GitHub confirmation |
 | Migrations | Synthetic local/test D1 only after real commands exist; NEVER staging/live migrations without explicit owner approval |
 | Blocked card | block-template comment · last line `blocked-by:` · 🙋 = needs you |
 | Secrets | NEVER read `.env`; key names via `.claude/bin/super-board-env-check.sh` |
