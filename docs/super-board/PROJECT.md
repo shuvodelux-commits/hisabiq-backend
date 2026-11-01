@@ -35,9 +35,15 @@ Current dependencies are Hono, TypeScript, Workers types, Wrangler and Vitest. T
 
 Required board verification commands are the frozen install, typecheck and unit-test commands. `test:workers`, lint, Playwright, secrets scanning and migration commands are not current package scripts; add real checks only when implemented. This overview records source and policy, not a fresh execution result or CI pass.
 
+## Implementation method
+
+Use GitHub Actions as the primary implementation execution and verification path, supported by Remote Desktop Commander, Codex Cloud and local Codex as task needs require. Super Board remains the sole orchestrator and GitHub the source of truth. Keep one active task and one writer, carry the same issue/branch/PR across environment handoffs, and apply the same TDD, independent QA/security/review and owner approval rules. See the [accepted execution-method decision](decisions/2026-11-01-implementation-execution-method.md).
+
+The existing Actions workflow currently verifies changes; it is not a configured coding agent or Actions implementation adapter. Verify and approve such an integration separately before code-writing dispatch. The saved Codex host configuration describes the current local path and is unchanged by this decision.
+
 ## Board operation
 
-Host: Codex. Base branch: `main`. Concurrency: `max_workers: 1` through P12. Never merge automatically. An explicit owner-chat instruction authorizes the agent to merge the identified PR after required checks, without a second GitHub `done` confirmation. Keep unattended merging disabled (`human_approves_merge: true`, `merge_policy.default: "human"`); follow the attended procedure in the execution plan. Required GitHub CI and main branch protection are readiness gates, not assumed facts.
+Inspected local host: Codex. Base branch: `main`. Concurrency: `max_workers: 1` through P12. Never merge automatically. An explicit owner-chat instruction authorizes the agent to merge the identified PR after required checks, without a second GitHub `done` confirmation. Keep unattended merging disabled (`human_approves_merge: true`, `merge_policy.default: "human"`); follow the attended procedure in the execution plan. Required GitHub CI and main branch protection are readiness gates, not assumed facts.
 
 Super Board is the sole task orchestrator. Approve narrow scope first; curate dependency-aware issues with testable acceptance criteria; onboard and lint before running eligible work. Build uses a failing behavioral test before implementation. Independent QA includes bundled `pr-security-review`; independent Review checks the exact PR head and evidence. Cloudflare `security-audit` is a separate, deliberately invoked milestone gate. Installation or readiness never proves an audit ran.
 
