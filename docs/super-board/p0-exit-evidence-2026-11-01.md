@@ -1,5 +1,7 @@
 # P0 exit evidence review — 2026-11-01
 
+> Historical evidence snapshot from before the owner authorized replacement of the older PRs. The current reconciliation decision is recorded at the end and in the linked P0.1 contract.
+
 **Decision:** P0 is not yet eligible for phase acceptance. The owner approved the execution plan and this evidence review; no PR merge, issue publication, worker execution or deployment approval is inferred.
 **Scope:** Operator evidence collection only; not independent product QA, PR security review or Cloudflare audit.
 **Local revision:** `8ac2a25` on `feat/p0-greenfield-foundation`, with pre-existing dirty/untracked changes. Local passing checks apply to this dirty checkout, not automatically to an exact published PR head.
@@ -44,7 +46,7 @@ Historical behavioral RED proof, license/secret-scan evidence, actual Workers/D1
 | Lint/run | Empty board, no real issue dependencies or native preflight, dirty non-base checkout | After separate publication authorization, curate the single P0 task and run native lint; dispatch only from a clean verified base |
 | P0.G | Implementation not landed, above evidence incomplete | Owner phase acceptance only after required proof and confirmed merges; plan approval does not close this gate |
 
-## Single next task
+## Historical handoff at the evidence-review checkpoint
 
 **P0.1 — Reconcile the existing scaffold and setup changes into reviewed draft PRs.** Reuse PR #1 where appropriate and make the boundary with PR #2 explicit. Preserve all existing changes and split scope if needed; do not create a competing foundation implementation. Establish the exact proposed head before independent QA/security/review. Publishing issues, starting workers and merging remain separate authorizations under the approved plan.
 
@@ -55,3 +57,7 @@ P1 remains gated. No code/schema/UI edits, worker dispatch, issue creation, PR m
 Following the owner's instruction to continue, the [P0.1 issue draft and scope map](tasks/p0-1-reconcile-foundation.md) were prepared locally. Migration document trees at `52afc6e` and `8ac2a25` compare equal; the migration commit must not be pushed onto foundation PR #1. Nine absolute plugin-cache skill links were identified as host-local state. The existing Wrangler compatibility-date change remains untouched.
 
 PR #1's title and description were reconciled to its published foundation scope, with pending independent QA/security evidence made explicit and the unverified fixed D1-capacity statement removed. Its draft state and code head remain unchanged. PR #2 was inspected and preserved. No commits, pushes, issues, workers, merges or deployments were made during this preparation. P0.1 issue publication is still awaiting separate authorization under the earlier no-issues instruction.
+
+## Current owner-authorized replacement decision
+
+The owner subsequently requested alignment of the drafts with the current plan or closure of the older PRs. The [current P0.1 contract](tasks/p0-1-reconcile-foundation.md) now preserves the scaffold and lifecycle design in one replacement draft. Close #1/#2 as superseded only after the new draft is published and verified; do not delete their branches. Earlier separate-PR instructions above describe the historical checkpoint and are not the current handoff. The original dirty checkout remains untouched, and no new runtime behavior is introduced. Independent P0 QA/security/audit and phase acceptance remain pending.
