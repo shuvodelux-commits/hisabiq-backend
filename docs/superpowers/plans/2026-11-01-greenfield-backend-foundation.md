@@ -43,9 +43,9 @@
 | 011 | PostgreSQL only after load/size triggers; adapter-tested in advance | Portability contract tests, no second live engine at launch |
 | 012 | Market Premium as a dedicated *database*, not hardware or latency guarantee | Product wording review |
 
-## Cloudflare Documentation Correction (as checked 2026-11-01)
+## Cloudflare Documentation Verification Gate (rechecked 2026-11-01)
 
-The current official D1 limits page says **50,000 databases/account on Workers Paid**, with increases by request; about **5,000 Worker resource bindings**; **10 GB per database**; **1 TB default account storage**; **100 bound parameters/query**. It also explains the **30-second entire batch limit** for API requests. The user-supplied revision claimed 100,000 included databases, which is inconsistent with the currently accessible official limits page. Do NOT embed these values as timeless constants. Reconfirm before provisioning at scale.
+Official D1 documentation snapshots retrieved at different revisions currently disagree: an older page reports **50,000 Workers Paid databases/account**, while the newer limits page updated 2026-10-30 reports **100,000 included**, **1,000,000 account maximum** and charges above included count. The user-provided hybrid architecture revision cites the newer allowance. Do not hardcode either as an immutable contract: confirm the live canonical docs, account entitlements and billing before large-scale provisioning. Other constraints to verify include **about 5,000 D1 bindings per Worker**, **10 GB per database**, **1 TB default account storage**, **100 bound parameters per query** and **30 seconds for the entire D1 batch call**. Prebound Premium spare capacity/Worker cells must be proven; the tenant registry cannot dynamically attach an arbitrary D1 binding at request time.
 Sources: https://developers.cloudflare.com/d1/platform/limits/ ; https://developers.cloudflare.com/d1/platform/pricing/
 Routine D1 export blocks requests: https://developers.cloudflare.com/d1/best-practices/import-export-data/
 
@@ -59,7 +59,19 @@ Routine D1 export blocks requests: https://developers.cloudflare.com/d1/best-pra
 | Premium | `dedicated` | One business per D1 |
 | Hot / >10GB path | Approved relocation | Fenced migration; PostgreSQL when proven necessary |
 
-For security, the tenant registry resolves the active placement and epoch; the client supplies neither database ID nor binding name. Sealed pools stop *new admission*, never silently discard valid in-flight financial postings. A Premium-to-Paid downgrade may preserve read-only history until a safe transfer is possible.
+For security, the tenant registry resolves the active placement and epoch; the client supplies neither database ID nor binding name. Sealed pools stop *new admission*, never silently discard valid in-flight financial postings. **Subscription plan and database placement are separate states**: a safe downgrade can temporarily leave a lower-tier customer on a dedicated database as a monitored placement exception without granting Premium entitlements.
+
+## Upgrade / Downgrade Lifecycle — Required Design
+
+Detailed owner-review specification: [Subscription & Database Placement Lifecycle](../specs/2026-11-01-subscription-database-lifecycle-design.md).
+Test-first implementation tasks: [Subscription-Aware Tenant Migration Plan](2026-11-01-subscription-database-migration.md).
+
+- **Free → Premium:** verified payment request → reserve prebound dedicated Premium D1 → tenant-filtered copy → source write fence → final consistency copy → accounting/inventory reconciliation → compare-and-swap placement epoch → activate dedicated placement/entitlements → read-only source retention.
+- **Premium → Basic / Medium / Free:** at the approved downgrade effective date apply lower-plan entitlements; relocate to eligible Paid/Free D1 if all storage/load/isolation gates pass. If too large or no target is available, keep the old database temporarily as an audited placement exception, alert operators, and retry; never delete invoices, journals or history to fit.
+- **Basic ↔ Medium:** same Paid D1 when capacity and schema gates allow; change subscription weights and entitlements without unnecessary data movement. **Paid → Free:** move to eligible Free pool only when safe.
+- **Every move:** preserve tenant identity, operation IDs, invoice sequences, FIFO lots, stock, balances, returns, attachments, authorized offline device lease and queued transactions. Only one placement can accept writes; after cutover recover forward rather than blindly switching backward.
+- **Production gates:** validate upgrade credit/refund and downgrade-at-renewal policies with owner; test crashes at every migration state, double billing callbacks, concurrent sales, stale routing, oversized data, source cleanup and offline sync retries.
+
 
 ## Bounded Contexts and Data Ownership
 
@@ -85,7 +97,7 @@ For security, the tenant registry resolves the active placement and epoch; the c
 | P4 | Immutable accounting and purchase posting | Balanced journals, supplier dues, stock and original-cost reversals |
 | P5 | Online POS, sales, returns, payments | Fully atomic sale, multi-unit, discounts, splits and return; unchanged UI connected |
 | P6 | Customer/supplier ledger and counter | Invoice-linked balances, reconciliation and cash sessions |
-| P7 | Tenant backup, restore and migration | Rehearsed shared-tenant restore, Premium restore, crash-safe upgrade/downgrade |
+| P7 | Tenant backup, restore and migration | One fenced engine for Free→Premium and Premium→Free/Paid, tenant-specific recovery, no data loss or double writer; full failure-injection suite |
 | P8 | Offline POS single-device mode | Pending/Synced; Needs Review only exceptional business conflicts; no double sales |
 | P9 | Reports, advisor and audit | Exact reconciliation to posted source entries, bounded queries |
 | P10 | Control center, plans, RBAC, settings | Subscription gating with no deletion of historical financial data |
@@ -169,10 +181,14 @@ Do not implement all modules in parallel. First complete P1 accounting and P2 is
 - Pool restore is tenant-consistent and isolated; no whole-pool point-in-time rewind for a single tenant.
 - Routine off-account recovery target initially **within 24h**, only advertised after restore drills; no claim of guaranteed zero-loss yet.
 - Standard D1 export blocks requests; no checkout-hour full-pool backup job.
-- Migration state machine: REQUESTED → AUTHORIZED → TARGET_RESERVED → SCHEMA_CHECKED → COPYING → SOURCE_WRITE_FENCED → RECONCILED → ROUTING_SWITCHED → VERIFIED → RETIRED.
+- Migration state machine: REQUESTED → AUTHORIZED → TARGET_RESERVED → SCHEMA_CHECKED → COPYING → SOURCE_WRITE_FENCED → FINAL_DELTA_OR_FROZEN_COPY → RECONCILED → ROUTING_SWITCHED → VERIFIED → COOLDOWN_READ_ONLY_SOURCE → RETIRED; support safe capacity deferral and pre-switch cancellation.
 - Only one placement is write-authoritative; reconcile accounting balances, stock, serial, invoice sequence, operation IDs and attachments before switching.
 - Offline-device lease epoch is separate from placement epoch. A paused sync remains Pending; only rejected business-validity exceptions show Needs Review.
 - Sync retries keep original operation IDs and cannot double-post.
+- Premium→Free/Basic/Medium downgrades keep all protected financial records even if shared target capacity is insufficient; entitlements can change while placement temporarily remains dedicated.
+- Basic↔Medium updates normally require no physical move when Paid pool admission remains safe.
+- Migration tests inject power/network failures immediately before/after CAS route switch, concurrent final-stock sales, duplicate billing events, and overdue offline queue resync.
+- Target provisioning must use a verified binding manifest/Worker-cell plan, never arbitrary client DB identifiers.
 
 ## Skill Execution Policy
 
