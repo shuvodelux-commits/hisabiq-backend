@@ -1,7 +1,7 @@
 # HisabIQ — Super Board Backend Execution Plan
 
 **Date:** 2026-11-01 · **Status:** Execution plan approved by owner; P0 evidence review and draft-PR alignment authorized. New implementation, issue publication, workers, merges and deployment remain separately gated.
-**Repository:** `shuvodelux-commits/hisabiq-backend` · **Host:** Codex · **Board:** [HisabIQ Backend #1](https://github.com/users/shuvodelux-commits/projects/1).
+**Repository:** `shuvodelux-commits/hisabiq-backend` · **Primary execution:** GitHub Actions · **Supporting methods:** Remote Desktop Commander, Codex Cloud, local Codex · **Inspected local host:** Codex · **Board:** [HisabIQ Backend #1](https://github.com/users/shuvodelux-commits/projects/1).
 
 ## 1. Authority, scope and present evidence
 
@@ -56,6 +56,14 @@ The conditional inspection intentionally returned missing entries; the unconditi
 ## 3. One orchestration system and distinct responsibilities
 
 The ordered process is Architecture, Specification, Task Breakdown, GitHub Issues, Lint, Build, QA, required Security, Review, Human Approval, then Next Task. Planning/specification/triage occur with the owner before a run. Build, QA and Review are the actual board lanes. Deeper security is an explicitly requested checkpoint, not an invented fourth automatic lane.
+
+### Implementation execution environments
+
+The owner has selected **GitHub Actions as the primary implementation and verification path**, supported by **Remote Desktop Commander, Codex Cloud and local Codex**. The [accepted execution-method decision](decisions/2026-11-01-implementation-execution-method.md) defines their roles and handoffs. Super Board still owns task selection, dependency handling and the single active task; these environments are not competing orchestrators.
+
+Use an approved configured Actions implementation job when available. Select a supporting method for approved remote interaction, cloud execution or local debugging/runtime needs, and record why. Handoffs retain the same issue, branch/PR and pinned Git revision; stop/checkpoint the previous writer before switching environments. Required TDD, independent QA/security/review, owner-requested merge and phase gates apply everywhere. Verify actual skills, tools, permissions and synthetic test-data access on the selected runner/host; local readiness does not establish cloud readiness.
+
+The current checked-in Actions workflow is **verification-only**. No issue-driven coding job or Super Board-to-Actions implementation adapter has been established by inspecting it. Separately scope and verify that integration before using Actions for code-writing dispatch. The existing `host: codex` / `worker_backend: workflow` configuration and local launcher details below remain descriptions of the installed local path, not an implementation of the new primary-path integration. This documentation change does not alter those settings or launch work.
 
 ### Stage ownership, activation and model profile
 
@@ -176,7 +184,7 @@ These are HisabIQ recommendations, not automatic lane settings or claims that a 
 
 Use the lightest profile that passes the same meaningful checks. Avoid defaulting every routine task to Astra/xhigh. Security helpers and truth-check analyses remain inside the current task's budget and scope; changing model does not replace them.
 
-### What the installed launcher actually supports
+### What the inspected local Codex launcher actually supports
 
 `.claude/bin/super-board-lane.sh`, class `Codex.LADDERS`, is the source for tier-to-model dispatch:
 
